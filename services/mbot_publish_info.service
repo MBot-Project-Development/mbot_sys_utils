@@ -1,0 +1,14 @@
+[Unit]
+Description=Push Mbot IP Address
+After=mbot_start_networking.target
+
+[Service]
+PIDFile=/run/mbot_pub_info.pid
+ExecStart=/home/pi/mbot-setup/mbot_publish_info.sh --PIDFile /run/mbot_pub_info.pid
+WorkingDirectory=/home/pi/mbot-setup
+Restart=never
+User=pi
+
+[Install]
+WantedBy=graphical.target
+

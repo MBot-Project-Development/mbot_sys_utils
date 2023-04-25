@@ -9,3 +9,5 @@ cd build
 cmake ..
 make -j4
 sudo make install
+cd lcm-python
+sudo python3 setup.py install
