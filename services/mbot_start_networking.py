@@ -1,14 +1,19 @@
 #!/usr/bin/python3
 import os
 import time
-import datetime 
+import datetime
+import subprocess 
 # Define the path to the config file
-config_file = "/boot/firmware/mbot_config.txt"
+is_ubuntu = 'Ubuntu' in subprocess.check_output(['cat', '/etc/os-release']).decode('utf-8')
+is_raspios = 'Raspberry Pi OS' in subprocess.check_output(['cat', '/etc/os-release']).decode('utf-8')
+
+if(is_ubuntu):
+    config_file = "/boot/firmware/mbot_config.txt"
+else:
+    config_file = "/boot/mbot_config.txt"
 
 # Define the path to the log file
-log_file = "/home/pi/mbot-setup/log/mbot_start_networking.log"
-
-host= 'google.com'
+log_file = "~/mbot_logs/mbot_start_networking.log"
 
 with open(log_file, "a") as log:
     current_time = datetime.datetime.now()
@@ -23,6 +28,7 @@ with open(log_file, "a") as log:
             key, value = line.strip().split("=")
             if key == "mbot_hostname":
                 hostname = value
+                ap_ssid = hostname + "-AP"
             elif key == "mbot_ap_ssid":
                 ap_ssid = value
             elif key == "mbot_ap_password":
@@ -109,10 +115,10 @@ with open(log_file, "a") as log:
                     break
             # Configure Network Manager to create a WiFi access point
             os.system(f"nmcli connection add type wifi ifname '*' con-name mbot_wifi_ap autoconnect no ssid {ap_ssid}")
-            os.system("nmcli connection modify mbot_wifi_ap 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.method shared")
+            os.system("nmcli connection modify mbot_wifi_ap 802-11-wireless.mode ap 802-11-wireless.band a ipv4.method shared")
             os.system(f"nmcli connection modify mbot_wifi_ap wifi-sec.key-mgmt wpa-psk wifi-sec.psk {ap_password}")
             os.system("nmcli connection modify mbot_wifi_ap ipv4.address 192.168.1.1/24 ipv4.dns '8.8.8.8 8.8.4.4'")
             log.write("Access point created successfully. \n")
             time.sleep(10.0)
             os.system("nmcli connection up mbot_wifi_ap")
-            log.write("Access point started successfully. \n")
+            log.write("Access point started. \n")

@@ -3,4 +3,5 @@ mbot_ap_password=iloverobots
 new_wifi_ssid=HomeWifiSSID
 new_wifi_password=HomeWifiPassword
 mbot_ip_list_url=https://gitlab.eecs.umich.edu/rob550-w23/mbot-ip.git
+mbot_ip_list_user=pi
 mbot_ip_list_token=glpat-APALNnFGz9YSZkPnG_se
