@@ -18,17 +18,22 @@ wait_for_ip() {
 
 HOSTNAME=$(hostname)
 IP=$(hostname -I | awk '{print $1}')
-LOG_PATH="~/mbot-logs"
+LOG_PATH="/var/log/mbot"
+mkdir -p $LOG_PATH
 LOG="$LOG_PATH/mbot_publish_info.log"
-CONFIG_FILE="/boot/firmware/mbot_config.txt"
+if [ "$(lsb_release -is)" = "Ubuntu" ]; then
+    CONFIG_FILE="/boot/firmware/mbot_config.txt"
+else
+    CONFIG_FILE="/boot/mbot_config.txt"
+fi
 GIT_USER=$(grep "^mbot_ip_list_user=" $CONFIG_FILE | cut -d'=' -f2)
 GIT_TOKEN=$(grep "^mbot_ip_list_token=" $CONFIG_FILE | cut -d'=' -f2)
 GIT_URL=$(grep "^mbot_ip_list_url=" $CONFIG_FILE | cut -d'=' -f2)
-GIT_ADDR= ${GIT_URL#*://}
-GIT_PATH="~/mbot-ip"
+GIT_ADDR=${GIT_URL#*://}
+GIT_PATH="/var/tmp/mbot-ip"
 TIMEOUT=30
 
-date > $LOG
+echo $(date) &>> $LOG
 echo "Updating IP" &>> $LOG
 echo "Hostname= $HOSTNAME" &>> $LOG
 if [ -z $IP ]; then 
@@ -36,6 +41,9 @@ if [ -z $IP ]; then
 fi
 echo "IP= $IP" &>> $LOG
 
+if [ ! -d "$GIT_PATH" ]; then
+    git clone --depth=1 "https://$GIT_USER:$GIT_TOKEN@$GIT_ADDR" "$GIT_PATH"
+fi
 
 git -C $GIT_PATH config --local user.email ""
 git -C $GIT_PATH config --local user.name "pi"

@@ -13,9 +13,11 @@ else:
     config_file = "/boot/mbot_config.txt"
 
 # Define the path to the log file
-log_file = "~/mbot_logs/mbot_start_networking.log"
-
+log_file = "/var/log/mbot/mbot_start_networking.log"
+os.makedirs(os.path.dirname(log_file), exist_ok = True)
+os.chmod(os.path.dirname(log_file), 0o777)
 with open(log_file, "a") as log:
+    os.chmod(log_file, 0o666)
     current_time = datetime.datetime.now()
     formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
     log.write("===== ")
