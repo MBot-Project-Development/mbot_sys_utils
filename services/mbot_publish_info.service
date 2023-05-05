@@ -5,7 +5,7 @@ After=mbot_start_networking.target
 [Service]
 PIDFile=/run/mbot_pub_info.pid
 ExecStart=/usr/local/etc/mbot_publish_info.sh --PIDFile /run/mbot_pub_info.pid
-WorkingDirectory=/home/pi/mbot-setup
+WorkingDirectory=/usr/local/etc
 Restart=never
 User=root
 
