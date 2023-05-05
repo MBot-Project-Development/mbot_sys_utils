@@ -30,7 +30,7 @@ GIT_USER=$(grep "^mbot_ip_list_user=" $CONFIG_FILE | cut -d'=' -f2)
 GIT_TOKEN=$(grep "^mbot_ip_list_token=" $CONFIG_FILE | cut -d'=' -f2)
 GIT_URL=$(grep "^mbot_ip_list_url=" $CONFIG_FILE | cut -d'=' -f2)
 GIT_ADDR=${GIT_URL#*://}
-GIT_PATH="/var/tmp/mbot-ip"
+GIT_PATH="/var/tmp/mbot_ip_registry"
 TIMEOUT=30
 
 echo $(date) &>> $LOG
@@ -45,13 +45,13 @@ if [ ! -d "$GIT_PATH" ]; then
     git clone --depth=1 "https://$GIT_USER:$GIT_TOKEN@$GIT_ADDR" "$GIT_PATH"
 fi
 
-git -C $GIT_PATH config --local user.email ""
-git -C $GIT_PATH config --local user.name "pi"
+git -C $GIT_PATH config --local user.email "$GIT_USER"
+git -C $GIT_PATH config --local user.name "$GIT_USER"
 #git config pull.rebase false
 git -C $GIT_PATH pull https://$GIT_USER:$GIT_TOKEN@$GIT_ADDR &>> $LOG
 
 echo "Calling python script" &>> $LOG
-python3 $GIT_PATH/main.py -hostname $HOSTNAME -ip $IP -log $LOG
+python3 $GIT_PATH/register_mbot.py -hostname $HOSTNAME -ip $IP -log $LOG
 echo "Adding..." &>> $LOG
 git -C $GIT_PATH/ add data/$HOSTNAME.json &>> $LOG
 echo "Committing..." &>> $LOG
