@@ -1,10 +1,11 @@
-#! /usr/bin/bash
-set -e
+#!/bin/bash
+
+set -e  # Quit on error.
 
 wait_for_ip() {
     echo "Waiting $TIMEOUT seconds for IP..." &>> $LOG
     count=0
-    while [ -z $IP ]; do 
+    while [ -z $IP ]; do
         if [ $count -gt $TIMEOUT ]; then
             echo "Timed out waiting for IP. Exiting." &>> $LOG
             exit 0
@@ -36,7 +37,7 @@ TIMEOUT=30
 echo $(date) &>> $LOG
 echo "Updating IP" &>> $LOG
 echo "Hostname= $HOSTNAME" &>> $LOG
-if [ -z $IP ]; then 
+if [ -z $IP ]; then
     wait_for_ip
 fi
 echo "IP= $IP" &>> $LOG
