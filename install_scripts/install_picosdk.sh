@@ -1,3 +1,7 @@
+#!/bin/bash
+
+set -e  # Quit on error.
+
 #### Install pico tools ####
 mkdir -p Installers
 cd Installers

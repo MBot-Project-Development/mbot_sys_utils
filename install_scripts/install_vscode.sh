@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e  # Quit on error.
+
 #### Install VSCode from Microsoft ####
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
 install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
