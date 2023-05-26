@@ -1,9 +1,11 @@
 #!/bin/bash
 
+set -e  # Quit on error.
+
 #### Install software from apt-get ####
 apt-get update
 apt-get upgrade -y
-apt-get -y install ssh git software-properties-common apt-transport-https wget gpg
+apt-get -y install ssh git software-properties-common apt-transport-https wget gpg cmake
 
 # install dependencies !! Need to make this is complete and all are used
 apt-get -y install build-essential wget dkms \
