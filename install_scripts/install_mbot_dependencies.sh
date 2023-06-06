@@ -17,8 +17,6 @@ apt-get -y install mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev
 # install python3 and scipy
 apt-get -y install python3-dev python3-numpy python3-matplotlib python3-opencv python3-scipy
 
-# install arm compilers for RPi Pico
-apt-get -y install gcc-arm-none-eabi libnewlib-arm-none-eabi
 
 #### Enable features for specific platforms ####
 # Check if running on RPi
