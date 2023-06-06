@@ -2,7 +2,7 @@
 import os
 import time
 import datetime
-import subprocess 
+import subprocess
 # Define the path to the config file
 is_ubuntu = 'Ubuntu' in subprocess.check_output(['cat', '/etc/os-release']).decode('utf-8')
 is_raspios = 'Raspberry Pi OS' in subprocess.check_output(['cat', '/etc/os-release']).decode('utf-8')
@@ -40,17 +40,17 @@ with open(log_file, "a") as log:
             elif key == "home_wifi_password":
                 home_wifi_password = value
 
-    # Set hostname immediately
-    os.system(f"hostnamectl set-hostname {hostname}")
-    # Set the hostname in /etc/hostname
-    with open("/etc/hostname", "w") as f:
-        f.write(hostname)
-    # Change the hostname in /etc/hosts
+    # Change the hostname in /etc/hosts. This has to be done first.
     with open("/etc/hosts", "r") as f:
         filedata = f.read()
         filedata = filedata.replace(os.uname()[1], hostname)
     with open("/etc/hosts", "w") as f:
         f.write(filedata)
+    # Set hostname on the system.
+    os.system(f"hostnamectl set-hostname {hostname}")
+    # Set the hostname in /etc/hostname
+    with open("/etc/hostname", "w") as f:
+        f.write(hostname)
     log.write(f"hostname set to '{hostname}'\n")
 
     # Check if there is an active WiFi connection
@@ -85,13 +85,13 @@ with open(log_file, "a") as log:
                     ssid.append(line.strip().split()[1])
                     channel.append(line.strip().split()[3])
                     signal.append(line.strip().split()[6])
-                    log.write(f"{line}\n")            
+                    log.write(f"{line}\n")
         log.write("\n")
         available = list(zip(bssid, ssid, channel, signal))
         sorted_avail = sorted(available, key=lambda x: (int(x[2]), int(x[3])), reverse=True)
         print(sorted_avail)
         if home_wifi_ssid in ssid:
-            # Check if we've already added the home network 
+            # Check if we've already added the home network
             for line in os.popen("nmcli connection show").readlines():
                 ssid = line.strip().split()[0]
                 log.write(f"{ssid}, ")
@@ -106,7 +106,7 @@ with open(log_file, "a") as log:
             else:
                 os.system(f"nmcli connection up '{home_wifi_ssid}'")
             log.write(f"Started connection to WiFi network '{home_wifi_ssid}'. Done.\n")
-            
+
         else:
             log.write("No networks found, starting Access Point\n")
             # Check if the access point already exists to delete, otherwise hostname may be wrong

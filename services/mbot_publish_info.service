@@ -1,6 +1,6 @@
 [Unit]
 Description=Push Mbot IP Address
-After=mbot_start_networking.target
+After=mbot_start_networking.service
 
 [Service]
 PIDFile=/run/mbot_pub_info.pid

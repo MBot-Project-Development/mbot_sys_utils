@@ -1,9 +1,11 @@
 #!/bin/bash
 
+set -e  # Quit on error.
+
 #### Install software from apt-get ####
 apt-get update
 apt-get upgrade -y
-apt-get -y install ssh git software-properties-common apt-transport-https wget gpg
+apt-get -y install ssh git software-properties-common apt-transport-https wget gpg cmake
 
 # install dependencies !! Need to make this is complete and all are used
 apt-get -y install build-essential wget dkms \
@@ -15,7 +17,7 @@ apt-get -y install build-essential wget dkms \
 apt-get -y install mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev
 
 # install python3 and scipy
-apt-get -y install python3-dev python3-numpy python3-matplotlib python3-opencv python3-scipy
+apt-get -y install python3-dev python3-numpy python3-matplotlib python3-opencv python3-scipy python3-pygame
 
 
 #### Enable features for specific platforms ####

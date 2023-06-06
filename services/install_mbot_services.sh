@@ -1,4 +1,7 @@
-#!/usr/bin/bash
+#!/bin/bash
+
+set -e  # Quit on error.
+
 sudo cp mbot_start_networking.py /usr/local/etc/
 sudo cp mbot_publish_info.sh /usr/local/etc/
 sudo cp mbot_start_network.service /etc/systemd/system/mbot_start_network.service
