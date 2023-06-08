@@ -30,5 +30,11 @@ cd ../..
 rm v1.5.0.tar.gz
 sudo rm -rf lcm-1.5.0/  # Sudo needed for the Python files.
 
+echo 
+echo "Increasing UDP buffer size..."
+echo
+echo "net.core.rmem_max=2097152" | sudo tee -a /etc/sysctl.conf
+echo "net.core.rmem_default=2097152" | sudo tee -a /etc/sysctl.conf
+
 echo
 echo "Done! LCM is now installed."
