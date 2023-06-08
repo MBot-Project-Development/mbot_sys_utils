@@ -26,6 +26,7 @@ sudo python3 setup.py install
 echo
 echo "Cleaning up..."
 echo
+cd ../..
 rm v1.5.0.tar.gz
 sudo rm -rf lcm-1.5.0/  # Sudo needed for the Python files.
 
