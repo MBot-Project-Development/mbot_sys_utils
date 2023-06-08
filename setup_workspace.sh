@@ -19,6 +19,6 @@ for repo in "${repos[@]}"; do
     git pull
     cd ..
   else
-    git clone "git@github.com:MBot-Project-Development/$repo.git"
+    git clone "https://github.com/MBot-Project-Development/$repo.git"
   fi
 done
