@@ -8,3 +8,6 @@ install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packa
 echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list
 apt update
 apt install code
+
+# Remove unneeded download.
+rm packages.microsoft.gpg

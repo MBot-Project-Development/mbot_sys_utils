@@ -12,7 +12,7 @@ sudo ./install_scripts/install_mbot_dependencies.sh
 2. Optional installs:
 ```bash
 sudo ./install_scripts/install_nomachine.sh
-sudo ./install_scripts/install_vsvode.sh
+sudo ./install_scripts/install_vscode.sh
 ```
 
 3. edit mbot_config.txt and copy it to the proper loacation in the boot folder. On Ubuntu 22.04 this is `/boot/firmware`, on Raspberry Pi OS this is just `/boot`:
