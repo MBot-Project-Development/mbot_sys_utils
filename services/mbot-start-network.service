@@ -3,11 +3,10 @@ Description=Start MBot Networking
 After=multi-user.target
 
 [Service]
-PIDFile = /run/mbot_start_net.pid
+PIDFile=/run/mbot_start_net.pid
 ExecStart=/usr/local/etc/mbot_start_networking.py --PIDFile /run/mbot_start_net.pid
-Restart=never
+Restart=no
 User=root
 
 [Install]
 WantedBy=graphical.target
-

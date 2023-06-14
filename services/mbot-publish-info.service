@@ -6,7 +6,7 @@ After=network-online.target
 PIDFile=/run/mbot_pub_info.pid
 ExecStart=/usr/local/etc/mbot_publish_info.sh --PIDFile /run/mbot_pub_info.pid
 WorkingDirectory=/usr/local/etc
-Restart=never
+Restart=no
 User=root
 
 [Install]
