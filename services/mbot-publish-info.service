@@ -1,13 +1,14 @@
 [Unit]
 Description=Push Mbot IP Address
+Wants=network-online.target
 After=network-online.target
 
 [Service]
-PIDFile=/run/mbot_pub_info.pid
-ExecStart=/usr/local/etc/mbot_publish_info.sh --PIDFile /run/mbot_pub_info.pid
+Type=oneshot
+ExecStart=/usr/local/etc/mbot_publish_info.sh
 WorkingDirectory=/usr/local/etc
-Restart=no
 User=root
+RemainAfterExit=yes
 
 [Install]
 WantedBy=graphical.target
