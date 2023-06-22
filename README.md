@@ -11,22 +11,27 @@ sudo ./install_scripts/install_mbot_dependencies.sh
 
 2. Optional installs:
 ```bash
-sudo ./install_scripts/install_nomachine.sh
-sudo ./install_scripts/install_vscode.sh
+sudo ./install_scripts/install_nomachine.sh   # Recommended for debugging.
+sudo ./install_scripts/install_vscode.sh      # Only if you want to develop on the Pi.
 ```
 
-3. edit mbot_config.txt and copy it to the proper loacation in the boot folder. On Ubuntu 22.04 this is `/boot/firmware`, on Raspberry Pi OS this is just `/boot`:
+3. Copy mbot_config.txt to the proper loacation in the boot folder. On Ubuntu 22.04 this is `/boot/firmware`, on Raspberry Pi OS this is just `/boot`:
 ```bash
 sudo cp mbot_config.txt [/boot, /boot/firmware]
 ```
 
-4. Install udev rules:
+4. Edit the configuration:
+```bash
+sudo nano [/boot/mbot_config.txt, /boot/firmware/mbot_config.txt]
+```
+
+5. Install udev rules:
 ```bash
 cd udev_rules
 ./install_rules.sh
 ```
 
-5. Install services:
+6. Install services:
 ```bash
 cd services
 ./install_mbot_services.sh
@@ -34,4 +39,4 @@ cd services
 
 7. Reboot.
 
-6. Test
+8. Test
