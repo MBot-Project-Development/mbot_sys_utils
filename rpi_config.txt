@@ -1,0 +1,44 @@
+# Additional overlays and parameters are documented /boot/overlays/README
+
+# Enable audio (loads snd_bcm2835)
+dtparam=audio=on
+
+# Automatically load overlays for detected cameras
+camera_auto_detect=1
+
+# Automatically load overlays for detected DSI displays
+display_auto_detect=1
+
+# Enable DRM VC4 V3D driver
+dtoverlay=vc4-kms-v3d
+max_framebuffers=2
+
+# Run in 64-bit mode
+arm_64bit=1
+
+# Disable compensation for displays with overscan
+disable_overscan=1
+
+[cm4]
+# Enable host mode on the 2711 built-in XHCI USB controller.
+# This line should be removed if the legacy DWC2 controller is required
+# (e.g. for USB device mode) or if USB support is not required.
+otg_mode=1
+
+[pi4]
+enable_uart=1
+# Always start desktop in DMT with 1280x720
+start_x=1
+hdmi_force_hotplug=1
+hdmi_group=2
+hdmi_mode=85
+
+# Overclock Settings, 
+# either use arm_boost to set to 1.8GHz or manually set 
+# arm_boost=1
+arm_freq=1600
+over_voltage=1
+
+# GPU Settings
+gpu_freq=500
+gpu_mem=76

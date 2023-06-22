@@ -1,4 +1,4 @@
-mbot_hostname=mbot-hal-9001
+mbot_hostname=mbot-0000
 mbot_ap_password=iloverobots
 new_wifi_ssid=HomeWifiSSID
 new_wifi_password=HomeWifiPassword
