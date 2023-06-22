@@ -22,15 +22,7 @@ sudo systemctl enable ssh
 sudo systemctl start ssh
 
 # Additional config
-sudo echo '#always start desktop' >> /boot/config.txt
-sudo echo 'start_x=1' >> /boot/config.txt
-sudo echo 'hdmi_force_hotplug=1' >> /boot/config.txt
-sudo echo 'hdmi_group=2' >> /boot/config.txt
-sudo echo 'hdmi_mode=85' >> /boot/config.txt
-#skipping CPU overclock since students don't run intellisense etc. on the bot
-sudo echo '#boost GPU' >> /boot/config.txt
-sudo echo 'gpu_freq=750' >> /boot/config.txt
-sudo echo 'gpu_mem=128' >> /boot/config.txt
+sudo cp ./rpi_config.txt /boot/config.txt
 
 #not setting desktop colors :(
 
