@@ -35,9 +35,9 @@ with open(log_file, "a") as log:
                 ap_ssid = value
             elif key == "mbot_ap_password":
                 ap_password = value
-            elif key == "home_wifi_ssid":
+            elif key == "new_wifi_ssid":
                 home_wifi_ssid = value
-            elif key == "home_wifi_password":
+            elif key == "new_wifi_password":
                 home_wifi_password = value
 
     # Change the hostname in /etc/hosts. This has to be done first.
