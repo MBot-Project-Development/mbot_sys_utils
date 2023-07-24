@@ -53,6 +53,10 @@ with open(log_file, "a") as log:
         f.write(hostname)
     log.write(f"hostname set to '{hostname}'\n")
 
+    # setup LO as multicast for localhost LCM connections
+    os.system("sudo ifconfig lo multicast")
+    os.system("sudo route add -net 224.0.0.0 netmask 240.0.0.0 dev lo")
+
     # Check if there is an active WiFi connection
     wifi_active = False
     wifi_status = os.popen("nmcli -t -f NAME,DEVICE,STATE c show --active").read().strip()
