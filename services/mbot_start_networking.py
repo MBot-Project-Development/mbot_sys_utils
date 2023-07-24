@@ -76,16 +76,22 @@ with open(log_file, "a") as log:
         channel = []
         signal = []
         log.write(f"Looking for home network '{home_wifi_ssid}'\n")
-        log.write("Wifi Scan: ")
+        log.write("Wifi Scan:\n")
         scan_output = os.popen("nmcli dev wifi list").read().split('\n')
         for line in scan_output:
-            if len(line.strip()) > 0 and not line.startswith("IN-USE"):
-                if line.strip().split()[1] == home_wifi_ssid:
-                    bssid.append(line.strip().split()[0])
-                    ssid.append(line.strip().split()[1])
-                    channel.append(line.strip().split()[3])
-                    signal.append(line.strip().split()[6])
+            line = line.strip()  # Remove whitespace before and after.
+            if len(line) > 0 and not line.startswith("IN-USE"):
+                if home_wifi_ssid in line:
                     log.write(f"{line}\n")
+                    # This line is the network we're looking for.
+                    ssid.append(home_wifi_ssid)
+                    # Some SSIDs have spaces so splitting will fail. Remove it from the line first.
+                    line = line.replace(home_wifi_ssid, "")
+
+                    # Grab the info for this network.
+                    bssid.append(line.split()[0])
+                    channel.append(line.split()[2])
+                    signal.append(line.split()[5])
         log.write("\n")
         available = list(zip(bssid, ssid, channel, signal))
         sorted_avail = sorted(available, key=lambda x: (int(x[2]), int(x[3])), reverse=True)
