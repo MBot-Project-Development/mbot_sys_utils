@@ -2,10 +2,11 @@
 
 set -e  # Quit on error.
 
-wget https://download.nomachine.com/download/8.4/Arm/nomachine_8.4.2_1_arm64.deb
-dpkg -i nomachine_8.4.2_1_arm64.deb
+# Get latest ARMv8 nomachine .deb (For both Jetson Nano and RPi4; see https://kb.nomachine.com/AR02R01074)
+wget https://www.nomachine.com/free/arm/v8/deb -O nomachine.deb
+sudo dpkg -i nomachine.deb
 
 # Clean up.
-rm nomachine_8.4.2_1_arm64.deb
+rm nomachine.deb
 
 echo "Done installing NoMachine."
