@@ -4,7 +4,6 @@ set -e  # Quit on error.
 
 SERVICE_LIST="mbot-start-network
               mbot-publish-info"
-            #   mbot-lcm-serial"
 
 # Copy the scripts we need for the services.
 sudo cp mbot_start_networking.py /usr/local/etc/
