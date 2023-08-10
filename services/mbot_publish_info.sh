@@ -59,5 +59,7 @@ echo "Committing..." &>> $LOG
 git -C $GIT_PATH/ commit -m "Auto update $HOSTNAME IP" &>> $LOG
 echo "Pushing..." &>> $LOG
 git -C $GIT_PATH/ push https://$GIT_USER:$GIT_TOKEN@$GIT_ADDR &>> $LOG
-echo "Done!" &>> $LOG
+echo "Deleting local copy..." &>> $LOG
+rm -rf $GIT_PATH
+echo "Done, exiting" &>> $LOG
 exit 0
