@@ -24,8 +24,10 @@ mkdir -p $LOG_PATH
 LOG="$LOG_PATH/mbot_publish_info.log"
 if [ "$(lsb_release -is)" = "Ubuntu" ]; then
     CONFIG_FILE="/boot/firmware/mbot_config.txt"
+    IP_OUT_FILE="/boot/firmware/ip_out.txt"
 else
     CONFIG_FILE="/boot/mbot_config.txt"
+    IP_OUT_FILE="/boot/ip_out.txt"
 fi
 GIT_USER=$(grep "^mbot_ip_list_user=" $CONFIG_FILE | cut -d'=' -f2)
 GIT_TOKEN=$(grep "^mbot_ip_list_token=" $CONFIG_FILE | cut -d'=' -f2)
@@ -41,6 +43,7 @@ if [ -z $IP ]; then
     wait_for_ip
 fi
 echo "IP= $IP" &>> $LOG
+echo "My IP is $IP!" > $IP_OUT_FILE
 
 if [ ! -d "$GIT_PATH" ]; then
     git clone --depth=1 "https://$GIT_USER:$GIT_TOKEN@$GIT_ADDR" "$GIT_PATH"
