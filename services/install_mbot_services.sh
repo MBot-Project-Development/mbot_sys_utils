@@ -15,6 +15,9 @@ do
     sudo cp $serv.service /etc/systemd/system/$serv.service
 done
 
+# Enable time sync wait service
+sudo systemctl enable --now systemd-time-wait-sync.service
+
 # Enable the services.
 sudo systemctl daemon-reload
 for serv in $SERVICE_LIST
