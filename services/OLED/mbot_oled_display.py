@@ -1,7 +1,23 @@
 import os
 import re
-import psutil
+import time
+import qrcode
 
+from luma.core.interface.serial import i2c
+from luma.core.render import canvas
+from luma.oled.device import ssd1306
+from PIL import ImageFont
+
+#dtparam=i2c_arm=on,i2c_baudrate=400000 include above in /boot/config.txt
+# Explicitly enable I2C via raspi-config (so i2cdetect -y 1 works)
+# pip3 install luma.oled qrcode
+
+fontpath = str("fonts/arial.ttf")
+font = ImageFont.truetype(fontpath, 14)
+fontpath = str("fonts/arial.ttf")
+font_small = ImageFont.truetype(fontpath, 10)
+
+device = ssd1306(i2c(port=1, address=0x3C))
 
 # Function to get the IP address of the wlan0 interface
 def get_wlan0_ip():
@@ -57,15 +73,32 @@ def get_connected_ssid():
         return str(e)
 
 
-def get_cpu_load():
+def get_mem_free():
     try:
-        # Get the CPU load for each core
-        cpu_load = psutil.cpu_percent(percpu=True)
-        return cpu_load
+        mem_output = os.popen("free -m | awk 'NR==2{printf \"%.2f%%\", $3*100/$2 }'").read()
+        return mem_output
+    except Exception as e:
+        return str(e)
+    
+def get_load_avg():
+    try:
+        load_output = os.popen("top -bn1 | grep load | awk '{print \"\", $11, $12, $13}'").read()
+        return load_output
     except Exception as e:
         return str(e)
 
-
+def get_QR_code(IP: str):
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(IP)
+    qr.make(fit=True)
+    qr_img = qr.make_image(fill_color="black", back_color="white")
+    qr_img = qr_img.resize((64, 64))
+    return qr_img
 
 def screen_wifi():
     #Get SSID
@@ -76,33 +109,50 @@ def screen_wifi():
     hostname_str = get_hostname()
     #Get uptime
     uptime_str = get_uptime()
-    print(uptime_str)
+    
+    # print it
+    with canvas(device) as draw:
+        draw.text((1,1), hostname_str, font=font_small, fill="white")
+        draw.text((1,17), "SSID: "+ SSID_str, font=font, fill="white")
+        draw.text((1,33), "IP: " + IP_str, font=font, fill="white")
+        draw.text((1,49), "Uptime: "+ uptime_str, font=font, fill="white")
+        
 
 def screen_QR():
     #Get IP
     IP_str = get_wlan0_ip()
     #Get QR code TODO use qrcode lib.
-    pass
-    
+    qr_img = get_QR_code("http://"+IP_str)
+    with canvas(device) as draw:
+        draw.text((1,1), "Webapp", font=font, fill="white")
+        draw.bitmap((64, 0), qr_img, fill="white")
+
 def screen_resources():
-    # Get and display the CPU load for each core
-    cpu_load = get_cpu_load()
-    if cpu_load:
-        for core, load in enumerate(cpu_load):
-            print(f"CPU Core {core}: {load}%")
-    else:
-        print("Failed to retrieve CPU load.")
-    #Get CPU
     #Get Mem
+    mem_str = get_mem_free()
     #Get load avg
-    pass
+    load_avg_str = get_load_avg()
     
+    with canvas(device) as draw:
+        draw.text((1,1), "Load Average: ", font=font_small, fill="white")
+        draw.text((20,17), load_avg_str, font=font_small, fill="white")
+        draw.text((1,33), "RAM Used: ", font=font_small, fill="white")
+        draw.text((20,49), mem_str, font=font_small, fill="white")
+
+services=["mbot-start-network.service", "mbot-publish-info.service", "mbot-rplidar-driver.service", "mbot-lcm-serial.service", "mbot-web-server.service", "mbot-motion-controller.service","mbot-slam.service"]
+
 def screen_services():
-    #Get list of services 
-    pass   
+    for service in services:
+        mem_output = os.popen("systemctl status " + service + " | head -3 | tail -1").read()
+        print(service)
+        print(mem_output.split())
+       
 
 def main():
     screen_resources()
+    screen_services()
+    while True:
+        time.sleep(1)
 
 if __name__ == '__main__':
     main()
