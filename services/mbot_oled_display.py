@@ -10,10 +10,6 @@ from luma.core.render import canvas
 from luma.oled.device import ssd1306
 from PIL import ImageFont
 
-#dtparam=i2c_arm=on,i2c_baudrate=400000 include above in /boot/config.txt
-# Explicitly enable I2C via raspi-config (so i2cdetect -y 1 works)
-# pip3 install luma.oled qrcode
-
 fontpath = str("/usr/local/etc/arial.ttf")
 font = ImageFont.truetype(fontpath, 14)
 fontpath = str("/usr/local/etc/arial.ttf")
