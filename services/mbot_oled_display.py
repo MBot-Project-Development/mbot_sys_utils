@@ -21,8 +21,8 @@ font_small = ImageFont.truetype(fontpath, 10)
 
 device = ssd1306(i2c(port=1, address=0x3C))
 
-SCREEN_CHANGE_DELAY = 5
-QR_SCREEN_CHANGE_DELAY = 10
+SCREEN_CHANGE_DELAY = 3
+QR_SCREEN_CHANGE_DELAY = 8
 
 # ---------------------------------------------Information fetching------------------------------------------------------
 
