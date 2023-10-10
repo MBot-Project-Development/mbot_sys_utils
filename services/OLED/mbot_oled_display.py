@@ -2,6 +2,7 @@ import os
 import re
 import time
 import qrcode
+import math
 
 from luma.core.interface.serial import i2c
 from luma.core.render import canvas
@@ -18,6 +19,11 @@ fontpath = str("fonts/arial.ttf")
 font_small = ImageFont.truetype(fontpath, 10)
 
 device = ssd1306(i2c(port=1, address=0x3C))
+
+SCREEN_CHANGE_DELAY = 5
+QR_SCREEN_CHANGE_DELAY = 10
+
+# ---------------------------------------------Information fetching------------------------------------------------------
 
 # Function to get the IP address of the wlan0 interface
 def get_wlan0_ip():
@@ -67,7 +73,7 @@ def get_connected_ssid():
         # Execute the iwgetid command and capture the output
         ssid_output = os.popen("iwgetid -r").read().strip()
         if not ssid_output:
-            ssid_output = "[Disconnected]"
+            ssid_output = "N/A"
         return ssid_output
     except Exception as e:
         return str(e)
@@ -99,6 +105,21 @@ def get_QR_code(IP: str):
     qr_img = qr.make_image(fill_color="black", back_color="white")
     qr_img = qr_img.resize((64, 64))
     return qr_img
+
+services=["mbot-start-network", "mbot-publish-info", "mbot-rplidar-driver", 
+          "mbot-lcm-serial", "mbot-web-server", "mbot-motion-controller", "mbot-slam", "mbot-oled"]
+serv_short_names = ["start-net", "pub-info", "lidar-drv", "lcm-ser", "webapp", "motion", "slam", "oled"]
+def get_services():
+    result = dict()
+    for i, service in enumerate(services):
+        serv_status = os.popen("systemctl status " + service + " | head -3 | tail -1").read()
+        if not serv_status:
+            result[serv_short_names[i]] = "not found"
+        else:
+            result[serv_short_names[i]] = serv_status.split()[2].strip('()') + (" " + serv_status.split()[-2] if "inactive" not in serv_status.split()[-2] else "")
+    return result
+
+#-----------------------------------------------Data Screens-------------------------------------------
 
 def screen_wifi():
     #Get SSID
@@ -139,20 +160,31 @@ def screen_resources():
         draw.text((1,33), "RAM Used: ", font=font_small, fill="white")
         draw.text((20,49), mem_str, font=font_small, fill="white")
 
-services=["mbot-start-network.service", "mbot-publish-info.service", "mbot-rplidar-driver.service", "mbot-lcm-serial.service", "mbot-web-server.service", "mbot-motion-controller.service","mbot-slam.service"]
 
 def screen_services():
-    for service in services:
-        mem_output = os.popen("systemctl status " + service + " | head -3 | tail -1").read()
-        print(service)
-        print(mem_output.split())
+    services = get_services()
+    n_screens = math.ceil(len(services) / 4)
+    for i in range(n_screens):
+        with canvas(device) as draw:
+            draw.text((1,1), serv_short_names[4*i] + ": " + services[serv_short_names[4*i]], font=font_small, fill="white")
+            if 4*i+1 < len(services):
+                draw.text((1,17), serv_short_names[4*i+1] + ": " + services[serv_short_names[4*i+1]], font=font_small, fill="white")
+            if 4*i+2 < len(services):
+                draw.text((1,33), serv_short_names[4*i+2] + ": " + services[serv_short_names[4*i+2]], font=font_small, fill="white")
+            if 4*i+3 < len(services):
+                draw.text((1,49), serv_short_names[4*i+3] + ": " + services[serv_short_names[4*i+3]], font=font_small, fill="white")
+        time.sleep(SCREEN_CHANGE_DELAY)
        
 
 def main():
-    screen_resources()
-    screen_services()
     while True:
-        time.sleep(1)
+        screen_wifi()
+        time.sleep(SCREEN_CHANGE_DELAY)
+        screen_QR()
+        time.sleep(QR_SCREEN_CHANGE_DELAY)
+        screen_resources()
+        time.sleep(SCREEN_CHANGE_DELAY)
+        screen_services()
 
 if __name__ == '__main__':
     main()
