@@ -1,4 +1,4 @@
-services=("mbot-start-network.service" "mbot-publish-info.service" "mbot-rplidar-driver.service" "mbot-lcm-serial.service" "mbot-web-server.service" "mbot-motion-controller.service" "mbot-slam.service")
+services=("mbot-start-network.service" "mbot-publish-info.service" "mbot-rplidar-driver.service" "mbot-lcm-serial.service" "mbot-web-server.service" "mbot-motion-controller.service" "mbot-slam.service" "mbot-oled.service")
 
 # Grab the third line
 for service in "${services[@]}"; do

@@ -3,11 +3,14 @@
 set -e  # Quit on error.
 
 SERVICE_LIST="mbot-start-network
-              mbot-publish-info"
+              mbot-publish-info
+              mbot-oled"
 
 # Copy the scripts we need for the services.
 sudo cp mbot_start_networking.py /usr/local/etc/
 sudo cp mbot_publish_info.sh /usr/local/etc/
+sudo cp mbot_oled_display.py /usr/local/etc/
+sudo cp arial.ttf /usr/local/etc/
 
 # Copy the services.
 for serv in $SERVICE_LIST
