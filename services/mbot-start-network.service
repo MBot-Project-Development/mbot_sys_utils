@@ -1,12 +1,14 @@
 [Unit]
 Description=Start MBot Networking
-After=multi-user.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=oneshot
 PIDFile=/run/mbot_start_net.pid
 ExecStart=/usr/local/etc/mbot_start_networking.py --PIDFile /run/mbot_start_net.pid
-Restart=no
+Restart=on-failure
+RestartSec=5
 User=root
 RemainAfterExit=yes
 

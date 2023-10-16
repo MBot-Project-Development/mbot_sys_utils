@@ -87,9 +87,9 @@ hdmi_force_hotplug=1
 hdmi_group=2
 hdmi_mode=85
 # Overclock
-arm_freq=1900
-over_voltage=4
+arm_freq=1800
+over_voltage=3
 # boost GPU
-gpu_freq=750
-gpu_mem=128
+# gpu_freq=750
+# gpu_mem=128
 
