@@ -17,7 +17,7 @@ apt -y install build-essential wget dkms \
 apt -y install mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev
 
 # install python3 and scipy
-apt -y install python3-dev python3-numpy python3-matplotlib python3-opencv python3-scipy python3-pygame
+apt -y install python3-dev python3-numpy python3-matplotlib python3-opencv python3-scipy python3-pygame python3-pip
 
 # Install python pkgs for MBot OLED
 pip3 install luma.oled qrcode
