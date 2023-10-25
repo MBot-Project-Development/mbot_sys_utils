@@ -29,15 +29,15 @@ do
     # echo "Copying $serv"
 done
 
-fstab_entry="UUID=0009-C325       /media/mbot/RPI-RP2   auto           defaults                                     0 0"
-# Check if the line already exists in /etc/fstab
-if grep -qFx "$fstab_entry" /etc/fstab; then
-    echo "entry exists in /etc/fstab."
-else
-    # Append the line to /etc/fstab
-    echo "$fstab_entry" | sudo tee -a /etc/fstab
-    echo "entry added to /etc/fstab."
-fi
+# fstab_entry="UUID=0009-C325       /media/mbot/RPI-RP2   auto           defaults                                     0 0"
+# # Check if the line already exists in /etc/fstab
+# if grep -qFx "$fstab_entry" /etc/fstab; then
+#     echo "entry exists in /etc/fstab."
+# else
+#     # Append the line to /etc/fstab
+#     echo "$fstab_entry" | sudo tee -a /etc/fstab
+#     echo "entry added to /etc/fstab."
+# fi
 
 # Success message.
 echo
