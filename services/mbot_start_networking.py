@@ -153,14 +153,16 @@ with open(log_file, "a") as log:
             os.system("nmcli connection up mbot_wifi_ap")
             log.write("Access point started. \n")
 
-    # Expose the GPIO pins
-    with open("/sys/class/gpio/export", "w") as f:
-        f.write(str(BTLD_PIN))
-    time.sleep(0.1)
-
-    with open("/sys/class/gpio/export", "w") as f:
-        f.write(str(RUN_PIN))
-    time.sleep(0.1)
+    if not os.path.exists(f"/sys/class/gpio/gpio{BTLD_PIN}"):
+        # Expose the GPIO pins
+        with open("/sys/class/gpio/export", "w") as f:
+            f.write(str(BTLD_PIN))
+        time.sleep(0.1)
+    
+    if not os.path.exists(f"/sys/class/gpio/gpio{RUN_PIN}"):
+        with open("/sys/class/gpio/export", "w") as f:
+            f.write(str(RUN_PIN))
+        time.sleep(0.1)
 
     # Set GPIO pins to output
     with open(f"/sys/class/gpio/gpio{BTLD_PIN}/direction", "w") as f:
@@ -170,39 +172,37 @@ with open(log_file, "a") as log:
     time.sleep(0.1)
 
     if autostart == "run":
-        # Set RUN_PIN to low
+        # Set RUN_PIN to low BTLD_PIN high
         with open(f"/sys/class/gpio/gpio{RUN_PIN}/value", "w") as f:
             f.write("0")
-        time.sleep(0.1)
-        # Set both pins to high
         with open(f"/sys/class/gpio/gpio{BTLD_PIN}/value", "w") as f:
             f.write("1")
-        with open(f"/sys/class/gpio/gpio{RUN_PIN}/value", "w") as f:
-            f.write("1")
         time.sleep(0.1)
-        log.write(f"Autostart is set to run \n")
-    elif autostart == "disable":
         # Set RUN_PIN to high
         with open(f"/sys/class/gpio/gpio{RUN_PIN}/value", "w") as f:
             f.write("1")
         time.sleep(0.1)
-        # Set BTLD_PIN to low, and toggle RUN_pin to low
+        log.write(f"Autostart is set to run \n")
+
+    elif autostart == "bootload":
+        # Set BTLD_PIN low and RUN_PIN to low
         with open(f"/sys/class/gpio/gpio{BTLD_PIN}/value", "w") as f:
             f.write("0")
+        with open(f"/sys/class/gpio/gpio{RUN_PIN}/value", "w") as f:
+            f.write("0")
+        time.sleep(0.1)
+        # Set RUN_PIN to high
+        with open(f"/sys/class/gpio/gpio{RUN_PIN}/value", "w") as f:
+            f.write("1")
+        log.write(f"Autostart is set to bootload \n")
+    
+    elif autostart == "disable":
+        # Set BTLD_PIN high and RUN_PIN to low
+        with open(f"/sys/class/gpio/gpio{BTLD_PIN}/value", "w") as f:
+            f.write("1")
         with open(f"/sys/class/gpio/gpio{RUN_PIN}/value", "w") as f:
             f.write("0")
         time.sleep(0.1)
         log.write(f"Autostart is disabled \n")
     else:
         log.write(f"Incorrect input for autostart variable, should be either run or disable \n")
-
-    # free up the resource
-    with open(f"/sys/class/gpio/gpio{BTLD_PIN}/direction", "w") as f:
-        f.write("in")
-    with open(f"/sys/class/gpio/gpio{RUN_PIN}/direction", "w") as f:
-        f.write("in")
-
-    with open("/sys/class/gpio/unexport", "w") as f:
-        f.write(str(BTLD_PIN))
-    with open("/sys/class/gpio/unexport", "w") as f:
-        f.write(str(RUN_PIN))
