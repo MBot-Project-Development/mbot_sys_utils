@@ -12,6 +12,23 @@ if(is_ubuntu):
 else:
     config_file = "/boot/mbot_config.txt"
 
+# Check devices then assign GPIO Numbers,
+# on Jetson, pin 7 is gpio216 and pin 11 is gpio50
+# on RPi pin 7 is gpio4, pin 11 is gpio17
+with open('/proc/device-tree/model', 'r') as file:
+    data = file.read()
+if "Raspberry Pi" in data:
+    print("Detected Raspberry Pi")
+    BTLD_PIN = 4
+    RUN_PIN = 17
+elif "NVIDIA Jetson" in data:
+    print("Detected NVIDIA Jetson")
+    BTLD_PIN = 50
+    RUN_PIN = 216
+else:
+    print("ERROR: Unknown hardware!")
+    exit(1)
+
 # Define the path to the log file
 log_file = "/var/log/mbot/mbot_start_networking.log"
 os.makedirs(os.path.dirname(log_file), exist_ok = True)
@@ -39,6 +56,8 @@ with open(log_file, "a") as log:
                 home_wifi_ssid = value
             elif key == "new_wifi_password":
                 home_wifi_password = value
+            elif key == "autostart":
+                autostart = value
 
     # Change the hostname in /etc/hosts. This has to be done first.
     with open("/etc/hosts", "r") as f:
@@ -70,7 +89,6 @@ with open(log_file, "a") as log:
     if wifi_active:
         # Already connected to  WiFi network
         log.write(f"Connected to active WiFi network '{name}'. Done.\n")
-
     else:
         # We don't have a wifi network, check for ones we know
         available_networks = []
@@ -134,3 +152,57 @@ with open(log_file, "a") as log:
             time.sleep(10.0)
             os.system("nmcli connection up mbot_wifi_ap")
             log.write("Access point started. \n")
+
+    # Expose the GPIO pins
+    with open("/sys/class/gpio/export", "w") as f:
+        f.write(str(BTLD_PIN))
+    time.sleep(0.1)
+
+    with open("/sys/class/gpio/export", "w") as f:
+        f.write(str(RUN_PIN))
+    time.sleep(0.1)
+
+    # Set GPIO pins to output
+    with open(f"/sys/class/gpio/gpio{BTLD_PIN}/direction", "w") as f:
+        f.write("out")
+    with open(f"/sys/class/gpio/gpio{RUN_PIN}/direction", "w") as f:
+        f.write("out")
+    time.sleep(0.1)
+
+    if autostart == "run":
+        # Set RUN_PIN to low
+        with open(f"/sys/class/gpio/gpio{RUN_PIN}/value", "w") as f:
+            f.write("0")
+        time.sleep(0.1)
+        # Set both pins to high
+        with open(f"/sys/class/gpio/gpio{BTLD_PIN}/value", "w") as f:
+            f.write("1")
+        with open(f"/sys/class/gpio/gpio{RUN_PIN}/value", "w") as f:
+            f.write("1")
+        time.sleep(0.1)
+        log.write(f"Autostart is set to run \n")
+    elif autostart == "disable":
+        # Set RUN_PIN to high
+        with open(f"/sys/class/gpio/gpio{RUN_PIN}/value", "w") as f:
+            f.write("1")
+        time.sleep(0.1)
+        # Set BTLD_PIN to low, and toggle RUN_pin to low
+        with open(f"/sys/class/gpio/gpio{BTLD_PIN}/value", "w") as f:
+            f.write("0")
+        with open(f"/sys/class/gpio/gpio{RUN_PIN}/value", "w") as f:
+            f.write("0")
+        time.sleep(0.1)
+        log.write(f"Autostart is disabled \n")
+    else:
+        log.write(f"Incorrect input for autostart variable, should be either run or disable \n")
+
+    # free up the resource
+    with open(f"/sys/class/gpio/gpio{BTLD_PIN}/direction", "w") as f:
+        f.write("in")
+    with open(f"/sys/class/gpio/gpio{RUN_PIN}/direction", "w") as f:
+        f.write("in")
+
+    with open("/sys/class/gpio/unexport", "w") as f:
+        f.write(str(BTLD_PIN))
+    with open("/sys/class/gpio/unexport", "w") as f:
+        f.write(str(RUN_PIN))
