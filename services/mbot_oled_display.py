@@ -47,21 +47,24 @@ def get_hostname():
 def get_uptime():
     try:
         uptime_output = os.popen("uptime -p").read().strip()
-        words = uptime_output.split()
-        word_mapping = {
-            'days': 'd',
-            'day': 'd',
-            'hours': 'h',
-            'hour': 'h',
-            'minutes': 'm',
-            'minute': 'm',
-        }
-        
-        shortened_words = [word_mapping[word] if word in word_mapping else word for word in words]
-        shortened_words = [word for word in shortened_words if word not in ['up', 'U']]
-        shortened_output = ''.join(shortened_words)
-        
-        return shortened_output
+        # Use regular expressions to extract hours and minutes
+        pattern = r'up (\d+) hour[s]*, (\d+) minute[s]*|up (\d+) minute[s]*'
+        match = re.match(pattern, uptime_output)
+
+        if match:
+            # Extract hours and minutes
+            hours, minutes, minutes_only = match.groups()
+
+            if minutes_only is not None:
+                # If only minutes are provided
+                formatted_str = f'{minutes_only}m'
+            else:
+                # If both hours and minutes are provided
+                formatted_str = f'{hours}h{minutes}m'
+
+            return formatted_str
+        else:
+            return uptime_output[3:]
     except Exception as e:
         return str(e)
     
@@ -74,7 +77,6 @@ def get_connected_ssid():
         return ssid_output
     except Exception as e:
         return str(e)
-
 
 def get_mem_free():
     try:
@@ -113,7 +115,13 @@ def get_services():
         if not serv_status:
             result[serv_short_names[i]] = "not found"
         else:
-            result[serv_short_names[i]] = serv_status.split()[2].strip('()') + (" " + serv_status.split()[-2] if "inactive" not in serv_status.split()[-2] else "")
+            keywords = ["loaded", "failed", "active", "inactive"]
+            activity_str = serv_status.split()[1] if serv_status.split()[1] in keywords else serv_status.split()[2]
+            result[serv_short_names[i]] = activity_str
+            if activity_str != "failed":
+                result[serv_short_names[i]] += " " + serv_status.split()[2]
+            else:
+                result[serv_short_names[i]] += " (" + serv_status.split()[3]
     return result
 
 #-----------------------------------------------Data Screens-------------------------------------------
@@ -132,17 +140,24 @@ def screen_wifi():
     with canvas(device) as draw:
         draw.text((1,1), hostname_str, font=font_small, fill="white")
         draw.text((1,17), "SSID: "+ SSID_str, font=font, fill="white")
-        draw.text((1,33), "IP: " + IP_str, font=font, fill="white")
-        draw.text((1,49), "Uptime: "+ uptime_str, font=font, fill="white")
-        
+        draw.text((1,33), "Uptime: "+ uptime_str, font=font, fill="white")
+        draw.line((0, 48, 127, 48), fill="white")
+        draw.text((1,49), IP_str, font=font, fill="white")
 
 def screen_QR():
     #Get IP
     IP_str = get_wlan0_ip()
-    #Get QR code TODO use qrcode lib.
+    # Split the IP string into two based on the location of the second dot
+    # This is done to make the IP address fit on the OLED screen
+    IP_str_1 = IP_str[:IP_str.find('.', IP_str.find('.') + 1)+1]
+    IP_str_2 = IP_str[IP_str.find('.', IP_str.find('.') + 1)+1:]
+    #Get QR code
     qr_img = get_QR_code("http://"+IP_str)
     with canvas(device) as draw:
-        draw.text((1,1), "Webapp", font=font, fill="white")
+        draw.text((1,1), "WebApp QR", font=font_small, fill="white")
+        draw.line((0, 32, 64, 32), fill="white")
+        draw.text((1,33), IP_str_1, font=font, fill="white")
+        draw.text((1,49), IP_str_2, font=font, fill="white")
         draw.bitmap((64, 0), qr_img, fill="white")
 
 def screen_resources():
@@ -154,22 +169,23 @@ def screen_resources():
     with canvas(device) as draw:
         draw.text((1,1), "Load Average: ", font=font_small, fill="white")
         draw.text((20,17), load_avg_str, font=font_small, fill="white")
-        draw.text((1,33), "RAM Used: ", font=font_small, fill="white")
-        draw.text((20,49), mem_str, font=font_small, fill="white")
+        draw.text((1,33), "RAM Used: " + mem_str, font=font_small, fill="white")
+        draw.line((0, 48, 127, 48), fill="white")
+        draw.text((1,49), get_wlan0_ip(), font=font, fill="white")
 
 
 def screen_services():
     services = get_services()
-    n_screens = math.ceil(len(services) / 4)
+    n_screens = math.ceil(len(services) / 3)
     for i in range(n_screens):
         with canvas(device) as draw:
-            draw.text((1,1), serv_short_names[4*i] + ": " + services[serv_short_names[4*i]], font=font_small, fill="white")
-            if 4*i+1 < len(services):
-                draw.text((1,17), serv_short_names[4*i+1] + ": " + services[serv_short_names[4*i+1]], font=font_small, fill="white")
-            if 4*i+2 < len(services):
-                draw.text((1,33), serv_short_names[4*i+2] + ": " + services[serv_short_names[4*i+2]], font=font_small, fill="white")
-            if 4*i+3 < len(services):
-                draw.text((1,49), serv_short_names[4*i+3] + ": " + services[serv_short_names[4*i+3]], font=font_small, fill="white")
+            draw.text((1,1), serv_short_names[3*i] + ": " + services[serv_short_names[3*i]], font=font_small, fill="white")
+            if 3*i+1 < len(services):
+                draw.text((1,17), serv_short_names[3*i+1] + ": " + services[serv_short_names[3*i+1]], font=font_small, fill="white")
+            if 3*i+2 < len(services):
+                draw.text((1,33), serv_short_names[3*i+2] + ": " + services[serv_short_names[3*i+2]], font=font_small, fill="white")
+            draw.line((0, 48, 127, 48), fill="white")
+            draw.text((1,49), get_wlan0_ip(), font=font, fill="white")
         time.sleep(SCREEN_CHANGE_DELAY)
        
 
